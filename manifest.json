@@ -1,0 +1,11 @@
+{
+  "manifest_version": 1,
+
+  "name": "Google Search Shortcut",
+  "description": "Lets you click on bolded snippets to load the web page and find them immediately in the result",
+  "version": "1.0",
+
+  "permissions": [
+    "activeTab"
+  ]
+}
