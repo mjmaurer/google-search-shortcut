@@ -5,6 +5,14 @@
   "description": "Lets you click on bolded snippets to load the web page and find them immediately in the result",
   "version": "1.0",
 
+  "content_scripts": [
+    {
+      "matches": [".*?google\\.com.*?[#&\\?]q=[^&]+.*?"],
+      "js": ["make-clickable.js", "send-word.js"],
+      "run_at": "document_end"
+    }
+  ],
+
   "permissions": [
     "activeTab"
   ]
