@@ -1,5 +1,5 @@
 {
-  "manifest_version": 1,
+  "manifest_version": 2,
 
   "name": "Google Search Shortcut",
   "description": "Lets you click on bolded snippets to load the web page and find them immediately in the result",
@@ -7,11 +7,16 @@
 
   "content_scripts": [
     {
-      "matches": [".*?google\\.com.*?[#&\\?]q=[^&]+.*?"],
-      "js": ["make-clickable.js", "send-word.js"],
+      "matches": ["*://www.google.com/*"],
+      "js": ["on-search-page.js"],
       "run_at": "document_end"
     }
   ],
+
+  "background": {
+    "scripts": ["find-text-event.js"],
+    "persistent": false
+  },
 
   "permissions": [
     "activeTab"
