@@ -10,6 +10,7 @@ function sendMessageFromTab(message) {
         }
     });
 }
+chrome.runtime.sendMessage({textToFind: 'hello'}, function(response) {});
 
 //TODO sendMessage can send anything. Think about changing
 document.body.innerHTML = document.body.innerHTML.replace(/<em>/g, '<em onclick=\"'
