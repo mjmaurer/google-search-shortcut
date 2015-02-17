@@ -4,6 +4,10 @@ function printIfDebug(message) {
     DEBUG && window.console && console.log(message);
 }
 
+chrome.webNavigation.onCompleted.addListener(function(details) {
+    // printIfDebug(details.url);
+});
+
 chrome.runtime.onMessage.addListener(
     function(message, sender, sendResponse) {
 
