@@ -8,7 +8,7 @@
   "content_scripts": [
     {
       "matches": ["*://www.google.com/*"],
-      "js": ["jquery-2.1.3.min.js", "on-search-page.js"],
+      "js": ["on-search-page.js"],
       "run_at": "document_end"
     }
   ],
@@ -19,7 +19,6 @@
   },
 
   "permissions": [
-    "webNavigation",
     "activeTab",
     "tabs", "*://*/*"
   ]

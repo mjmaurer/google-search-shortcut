@@ -24,8 +24,12 @@ function replace() {
 document.body.innerHTML = document.body.innerHTML.replace(/<em>/g, '<em onclick=\"'
         + 'chrome.runtime.sendMessage({textToFind: \'hello\'}, function(response) {});\">');
 
-if ("onhashchange" in window) {
-    window.onhashchange = replace;
-    alert("The browser supports the hashchange event!");
+$( document ).ajaxComplete(function() {
+    $("#wait").css("display", "block");
+});
 
-}
+// if ("onhashchange" in window) {
+//     window.onhashchange = replace;
+//     alert("The browser supports the hashchange event!");
+
+// }

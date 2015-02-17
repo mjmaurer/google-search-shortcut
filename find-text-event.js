@@ -4,8 +4,8 @@ function printIfDebug(message) {
     DEBUG && window.console && console.log(message);
 }
 
-chrome.webNavigation.onCompleted.addListener(function(details) {
-    // printIfDebug(details.url);
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    printIfDebug(details.url);
 });
 
 chrome.runtime.onMessage.addListener(
