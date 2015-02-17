@@ -11,25 +11,6 @@ function sendMessageFromTab(message) {
     });
 }
 
-function replace() {
-    alert(document.readyState);
-    document.body.innerHTML = document.body.innerHTML.replace(/<em>/g, '<em onclick=\"'
-        + 'chrome.runtime.sendMessage({textToFind: \'hello\'}, function(response) {});\">');
-}
-
-
-// chrome.runtime.sendMessage({textToFind: 'hello'}, function(response) {});
-
 //TODO sendMessage can send anything. Think about changing
 document.body.innerHTML = document.body.innerHTML.replace(/<em>/g, '<em onclick=\"'
         + 'chrome.runtime.sendMessage({textToFind: \'hello\'}, function(response) {});\">');
-
-$( document ).ajaxComplete(function() {
-    $("#wait").css("display", "block");
-});
-
-// if ("onhashchange" in window) {
-//     window.onhashchange = replace;
-//     alert("The browser supports the hashchange event!");
-
-// }

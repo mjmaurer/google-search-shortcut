@@ -5,7 +5,16 @@ function printIfDebug(message) {
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    printIfDebug(details.url);
+    if (typeof tab.url !== "undefined" && (/.*?google.com.*?[#&\?]q=[^&]+/g).test(tab.url)) {
+        printIfDebug("Processing url: " + tab.url);
+        chrome.tabs.executeScript(tabId, {file:"on-search-page.js", runAt:"document_end"}, function() {
+            if (chrome.runtime.lastError) {
+                printIfDebug(chrome.runtime.lastError.message);
+            } else {
+                printIfDebug("Update script injected");
+            }
+        });
+    }
 });
 
 chrome.runtime.onMessage.addListener(
