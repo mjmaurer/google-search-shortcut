@@ -7,12 +7,14 @@ function printIfDebug(message) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (typeof tab.url !== "undefined" && (/.*?google.com.*?[#&\?]q=[^&]+/g).test(tab.url)) {
         printIfDebug("Processing url: " + tab.url);
-        chrome.tabs.executeScript(tabId, {file:"on-search-page.js", runAt:"document_end"}, function() {
-            if (chrome.runtime.lastError) {
-                printIfDebug(chrome.runtime.lastError.message);
-            } else {
-                printIfDebug("Update script injected");
-            }
+        chrome.tabs.executeScript(tabId, {file:"jquery-2.1.3.min.js", runAt:"document_end"}, function() {
+            chrome.tabs.executeScript(tabId, {file:"on-search-page.js", runAt:"document_end"}, function() {
+                if (chrome.runtime.lastError) {
+                    printIfDebug(chrome.runtime.lastError.message);
+                } else {
+                    printIfDebug("Update script injected");
+                }
+            });
         });
     }
 });
