@@ -6,7 +6,7 @@
   "version": "1.0",
 
   "background": {
-    "scripts": ["find-text-event.js"],
+    "scripts": ["google-event-handler.js"],
     "persistent": false
   },
 
