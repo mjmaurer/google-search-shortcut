@@ -7,7 +7,11 @@
 
   "background": {
     "scripts": ["google-event-handler.js"],
-    "persistent": false
+    "persistent": true
+  },
+
+  "icons": {
+    "128": "icon128.png"
   },
 
   "permissions": [
