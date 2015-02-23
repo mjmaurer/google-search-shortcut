@@ -1,16 +1,48 @@
 //TODO sendMessage can send anything. Think about changing
 
-// TODO extra span of class ft appears
-$('span.st').html(function(index, old) {
-    return '<span class="querySeg">' + old.replace(/(\s|&nbsp;|\.)+\.\.\.(\s|&nbsp;|\.)*/g, '</span> ... <span class="querySeg">') + '</span>';
-});
+// try window.load
 
-$('span.querySeg').click(function(){
-    var url = $(this).closest('.g').find("a").attr("href");
-    chrome.runtime.sendMessage({newUrl:url, message:this.textContent}, function(response) {
-        window.location.href = url;
-    });
-    // window.location.href = $(this).closest('.g').find("a").attr("href");
-    //alert(this.textContent);
-    //alert($(this).closest('.g').find("a").attr("href"));
-});
+// test webNavigation
+// if it works for every new google search page:
+// set onhashchange to setInterval for some amount of time
+// and setTimeout for when to clear the interval
+
+// TODO extra span of class ft appears
+
+// If these are defined, then we should clear them on a page update / hash change
+if (typeof intervalUpdate !== 'undefined') {
+    window.clearInterval(intervalUpdate);
+}
+
+if (typeof timeoutClear !== 'undefined') {
+    window.clearTimeout(timeoutClear);
+}
+
+configureSearchPage = function() {
+    if($('span.querySeg').length == 0) {
+        $('span.st').html(function(index, old) {
+            return '<span class="querySeg">' + old.replace(/(\s|&nbsp;|\.)+\.\.\.(\s|&nbsp;|\.)*/g, '</span> ... <span class="querySeg">') + '</span>';
+        });
+
+        $('span.querySeg').click(function(){
+            var url = $(this).closest('.g').find("a").attr("href");
+            chrome.runtime.sendMessage({newUrl:url, message:this.textContent}, function(response) {
+                window.location.href = url;
+            });
+        });
+    }
+};
+
+clearInterval = function() {
+    window.clearInterval(intervalUpdate);
+};
+
+// Do it once initially
+configureSearchPage();
+
+var repeatTime = 200;
+var numTimes = 20;
+
+// Repeat configure for some number of times
+var intervalUpdate = window.setInterval(configureSearchPage, repeatTime);
+var timeoutClear = window.setTimeout(clearInterval, repeatTime * numTimes);
