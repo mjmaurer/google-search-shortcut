@@ -4,6 +4,7 @@ function printIfDebug(message) {
     DEBUG && window.console && console.log(message);
 }
 
+// State variables
 var newPageUrl = null;
 var searchText = null;
 
@@ -25,14 +26,16 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         // Next page is loading or in the process of loading
         //TODO: document idle vs document end?
         chrome.tabs.executeScript(tabId, {file:"jquery-2.1.3.min.js", runAt:"document_end"}, function() {
-            chrome.tabs.executeScript(tabId, {code:"window.find(\"" + searchText + "\");", runAt:"document_end"}, function() {
-                newPageUrl = null;
-                searchText = null;
-                if (chrome.runtime.lastError) {
-                    printIfDebug(chrome.runtime.lastError.message);
-                } else {
-                    printIfDebug("New page script injected");
-                }
+            chrome.tabs.executeScript(tabId, {code:"var searchText = \"" + searchText + "\";", runAt:"document_start"}, function() {
+                chrome.tabs.executeScript(tabId, {file:"on-new-page.js", runAt:"document_end"}, function() {
+                    newPageUrl = null;
+                    searchText = null;
+                    if (chrome.runtime.lastError) {
+                        printIfDebug(chrome.runtime.lastError.message);
+                    } else {
+                        printIfDebug("New page script injected");
+                    }
+                });
             });
         });
     }
@@ -50,6 +53,8 @@ chrome.runtime.onMessage.addListener(
         } else {
             newPageUrl = message.newUrl;
             searchText = message.message;
+            searchText = searchText.replace(/[^a-zA-Z0-9]+$/, "");
+            searchText = searchText.replace(/^[^a-zA-Z0-9]+/, "");
             sendResponse(null);
         }
     });
