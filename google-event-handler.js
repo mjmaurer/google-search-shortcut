@@ -22,11 +22,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
                 }
             });
         })
-    } else if (newPageUrl == tab.url && changeInfo.status == "complete" && typeof tab.url !== "undefined") {
+    } else if (newPageUrl == tab.url && changeInfo.status == "loading" && typeof tab.url !== "undefined") {
         // Next page is loading or in the process of loading
         //TODO: document idle vs document end?
         chrome.tabs.executeScript(tabId, {file:"jquery-2.1.3.min.js", runAt:"document_end"}, function() {
-            chrome.tabs.executeScript(tabId, {code:"var searchText = \"" + searchText + "\";", runAt:"document_start"}, function() {
+            chrome.tabs.executeScript(tabId, {code:"var searchText = \"" + searchText + "\";", runAt:"document_end"}, function() {
                 chrome.tabs.executeScript(tabId, {file:"on-new-page.js", runAt:"document_end"}, function() {
                     newPageUrl = null;
                     searchText = null;

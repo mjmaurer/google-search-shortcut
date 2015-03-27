@@ -9,6 +9,10 @@
 
 // TODO extra span of class ft appears
 
+function escapeText(text) {
+    return text.replace(/"/g, '\\\"').replace(/'/g, '\\\'').replace(/\//g, '\\\\');
+}
+
 // If these are defined, then we should clear them on a page update / hash change
 if (typeof intervalUpdate !== 'undefined') {
     window.clearInterval(intervalUpdate);
@@ -26,7 +30,8 @@ configureSearchPage = function() {
 
         $('span.querySeg').click(function(){
             var url = $(this).closest('.g').find("a").attr("href");
-            chrome.runtime.sendMessage({newUrl:url, message:this.textContent}, function(response) {
+            var searchText = escapeText(this.textContent);
+            chrome.runtime.sendMessage({newUrl:url, message:searchText}, function(response) {
                 window.location.href = url;
             });
         });
