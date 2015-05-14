@@ -10,7 +10,7 @@
 // TODO extra span of class ft appears
 
 function escapeText(text) {
-    return text.replace(/"/g, '\\\"').replace(/'/g, '\\\'').replace(/\//g, '\\\\');
+    return text.replace(/"/g, '\\\"').replace(/'/g, '\\\'').replace(/\//g, '\\\/');
 }
 
 // If these are defined, then we should clear them on a page update / hash change
@@ -48,6 +48,7 @@ configureSearchPage();
 var repeatTime = 200;
 var numTimes = 20;
 
+// TODO this is causing some error. See console
 // Repeat configure for some number of times
 var intervalUpdate = window.setInterval(configureSearchPage, repeatTime);
 var timeoutClear = window.setTimeout(clearInterval, repeatTime * numTimes);
