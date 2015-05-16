@@ -33,11 +33,11 @@ configureSearchPage = function() {
 
             // Remove extra spans inside the segment (such as update date)
             var searchText = $(this).contents().filter(function() {
-                return this.nodeName.toLowerCase() !== 'span';
+                return this.className.toLowerCase() !== 'f';
             }).text();
 
             searchText = escapeText(searchText);
-            
+
             chrome.runtime.sendMessage({newUrl:url, message:searchText}, function(response) {
                 window.location.href = url;
             });

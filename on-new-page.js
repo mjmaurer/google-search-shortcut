@@ -70,7 +70,7 @@ function walkTheDOM(node, state) {
     if (node.nodeName === 'SCRIPT' || node.nodeName === 'HEAD') return false;
     if (state.searchResult) {
         scrollAndHighlight(state.searchResult.nodesToHighlight);
-        return;
+        return true;
     }
     processNode(node, state);
     node = node.firstChild;
@@ -78,6 +78,7 @@ function walkTheDOM(node, state) {
         walkTheDOM(node, state);
         node = node.nextSibling;
     }
+    return false;
 }
 
 function SearchState(pattern) {
@@ -131,12 +132,13 @@ function SearchState(pattern) {
         return toAdd
     }
 
-    console.log(pattern);
     //TODO add suffix rule to boyer-moore
     this.processTextNode = function(textNode) {
         textQueue.push(textNode);
         bufferedLength += addToTextView(textNode.textContent).length;
 
+        console.log("Pattern len: " + pattern.length + ". Buffer len: " + bufferedLength);
+        console.log(textView);
         if (bufferedLength >= pattern.length) {
             while (getFromText(i) != null) {
                 console.log("TextView: " + textView);
@@ -148,7 +150,7 @@ function SearchState(pattern) {
                     i--;
                 }
                 if (j == -1) {
-                    while (i - firstLetterPos >= pattern.length) {
+                    while (i - firstLetterPos >= 0 && textQueue.length > 1) {
                         var removed = textQueue.shift();
                         var remLen = chopAndEscape(removed.textContent).length;
                         firstLetterPos += remLen;
@@ -189,10 +191,8 @@ function SearchState(pattern) {
 
 searchText = chopAndEscape(searchText);
 //var containingEle = recursiveSearch(document.body, searchText);
-if (false) {
+if (!walkTheDOM(document.body, new SearchState(searchText))) {
     alert("Nothing found on page");
-} else {
-    walkTheDOM(document.body, new SearchState(searchText));
 }
 // scrollHere = document.getElementById(newId);
 // document.body.scrollTop = ($(scrollHere).offset().top - ($(window).height() - $(scrollHere).outerHeight(true)) / 2);
