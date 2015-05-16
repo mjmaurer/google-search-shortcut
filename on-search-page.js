@@ -30,7 +30,14 @@ configureSearchPage = function() {
 
         $('span.querySeg').click(function(){
             var url = $(this).closest('.g').find("a").attr("href");
-            var searchText = escapeText(this.textContent);
+
+            // Remove extra spans inside the segment (such as update date)
+            var searchText = $(this).contents().filter(function() {
+                return this.nodeName.toLowerCase() !== 'span';
+            }).text();
+
+            searchText = escapeText(searchText);
+            
             chrome.runtime.sendMessage({newUrl:url, message:searchText}, function(response) {
                 window.location.href = url;
             });

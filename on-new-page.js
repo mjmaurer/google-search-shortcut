@@ -8,8 +8,31 @@ function makeId() {
     return text;
 }
 
-function scrollAndHighlight(textQueue) {
+function replaceNode(textNode, newNode) {
+    var pNode = textNode.parentNode;
+    pNode.replaceChild(newNode, textNode);
+    return pNode;
+}
 
+function createHighlightedSpan(text) {
+    var e = document.createElement("span");
+    e.style.backgroundColor = "#FDFF47";
+    e.appendChild(document.createTextNode(text));
+    return e;
+}
+
+function scrollAndHighlight(textQueue) {
+    var scrollHere;
+    for (k = 0; k < textQueue.length; k++) {
+        node = textQueue[k];
+        console.log(node.textContent);
+        var newNode = createHighlightedSpan(node.textContent);
+        ele = replaceNode(node, newNode);
+        if (k == 0) {
+            scrollHere = ele;
+        }
+    }
+    document.body.scrollTop = ($(scrollHere).offset().top - ($(window).height() - $(scrollHere).outerHeight(true)) / 2);
 }
 
 // Always keep enought text nodes in state so that the pattern can fit ending with the first
@@ -37,6 +60,10 @@ function processNode(node, state) {
             console.log("FOUND IT");
         }
     }
+}
+
+function chopAndEscape(someText) {
+    return someText.replace(/(\s|&nbsp;|\.)*/g, '').replace(/('|’)/g, "'");
 }
 
 function walkTheDOM(node, state) {
@@ -75,14 +102,13 @@ function SearchState(pattern) {
     // Flattened textQueue, so we dont have to join() every time
     var textView = "";
 
-    // How many textNodes' chars are currently buffered?
-    var bufferedLength = 0;
-
     // J is position in pattern, I is position in DOM
     // fLP is absolute position of first letter in textQueue
+    // How many textNodes' chars are currently buffered?
     var i = pattern.length - 1,
         j = pattern.length - 1,
-        firstLetterPos = 0;
+        firstLetterPos = 0,
+        bufferedLength = 0;
 
     getFromText = function(i) {
         return (i - firstLetterPos) < textView.length ? textView[i - firstLetterPos] : null;
@@ -95,26 +121,41 @@ function SearchState(pattern) {
 
     updateTextView = function() {
         textView = textQueue.map(function(node) {
-            return node.textContent;
+            return chopAndEscape(node.textContent);
         }).join("");
     }
 
+    addToTextView = function(newText) {
+        var toAdd = chopAndEscape(newText);
+        textView += toAdd;
+        return toAdd
+    }
+
+    console.log(pattern);
     //TODO add suffix rule to boyer-moore
     this.processTextNode = function(textNode) {
         textQueue.push(textNode);
-        updateTextView();
-        bufferedLength += textNode.textContent.length;
+        bufferedLength += addToTextView(textNode.textContent).length;
 
         if (bufferedLength >= pattern.length) {
             while (getFromText(i) != null) {
                 console.log("TextView: " + textView);
-                console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
                 console.log("Context: " + textView.substring(i - firstLetterPos, textView.length));
+                console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
                 while (j >= 0 && pattern[j] == getFromText(i)) {
+                    console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
                     j--;
                     i--;
-                } 
+                }
                 if (j == -1) {
+                    while (i - firstLetterPos >= pattern.length) {
+                        var removed = textQueue.shift();
+                        var remLen = chopAndEscape(removed.textContent).length;
+                        firstLetterPos += remLen;
+                        bufferedLength -= remLen;
+                        console.log("Removed: " + removed.textContent);
+                    }
+                    updateTextView();
                     this.searchResult = {
                         nodesToHighlight : textQueue,
                         firstPos : i - firstLetterPos + 1,
@@ -125,7 +166,7 @@ function SearchState(pattern) {
                     // The max is needed for the case where
                     // the shift actually causes us to compare things weve
                     // already compared
-                    i += Math.min(j, Math.max(pattern.length - j, letOffset));
+                    i += Math.max(pattern.length - j, letOffset);
                     j = pattern.length - 1;
                 }
             }
@@ -133,18 +174,21 @@ function SearchState(pattern) {
 
         // Dequeue first node if no longer needed
         // Shift up firstLetterPos
-        if (bufferedLength - textQueue[0].length >= pattern.length) {
+        while (i - firstLetterPos >= pattern.length) {
             var removed = textQueue.shift();
-            firstLetterPos += removed.length;
-            bufferedLength -= removed.length;
-            updateTextView();
+            var remLen = chopAndEscape(removed.textContent).length;
+            firstLetterPos += remLen;
+            bufferedLength -= remLen;
+            console.log("Removed: " + removed.textContent);
         }
+        updateTextView();
 
         return false;
     };
 }
 
-var containingEle = recursiveSearch(document.body, searchText);
+searchText = chopAndEscape(searchText);
+//var containingEle = recursiveSearch(document.body, searchText);
 if (false) {
     alert("Nothing found on page");
 } else {
