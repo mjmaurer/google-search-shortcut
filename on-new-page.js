@@ -41,12 +41,12 @@ function scrollAndHighlight(textQueue) {
 //TODO if whole pattern doesnt work, try breaking up based on periods. Search 'asdf' for this edge case
 //TODO test timings with and without this function
 function recursiveSearch(element, text) {
-    if (element.children.length == 0 && element.textContent !== undefined && element.textContent.replace(/\s+/gm," ").indexOf(text) != -1) {
+    if (element.children.length == 0 && element.textContent && element.textContent.replace(/\s+/gm," ").indexOf(text) != -1) {
         return element;
     }
     for (var i = 0; i < element.children.length; i++) {
         var child = element.children[i];
-        if (child.textContent !== undefined && child.textContent.replace(/\s+/gm," ").indexOf(text) != -1) {
+        if (child.textContent && child.textContent.replace(/\s+/gm," ").indexOf(text) != -1) {
             return recursiveSearch(child, text) || child;
         }
     }
@@ -75,7 +75,9 @@ function walkTheDOM(node, state) {
     processNode(node, state);
     node = node.firstChild;
     while (node) {
-        walkTheDOM(node, state);
+        if (walkTheDOM(node, state)) {
+            return true;
+        }
         node = node.nextSibling;
     }
     return false;
@@ -190,6 +192,7 @@ function SearchState(pattern) {
 }
 
 searchText = chopAndEscape(searchText);
+console.log(searchText);
 //var containingEle = recursiveSearch(document.body, searchText);
 if (!walkTheDOM(document.body, new SearchState(searchText))) {
     alert("Nothing found on page");
