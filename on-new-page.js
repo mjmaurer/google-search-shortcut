@@ -21,17 +21,50 @@ function createHighlightedSpan(text) {
     return e;
 }
 
+function highlightTextNode(node) {
+    console.log(node.textContent);
+    var newNode = createHighlightedSpan(node.textContent);
+    return replaceNode(node, newNode);
+}
+
 function scrollAndHighlight(textQueue) {
-    var scrollHere;
-    for (k = 0; k < textQueue.length; k++) {
-        node = textQueue[k];
-        console.log(node.textContent);
-        var newNode = createHighlightedSpan(node.textContent);
-        ele = replaceNode(node, newNode);
-        if (k == 0) {
-            scrollHere = ele;
+    var scrollHere = null;
+    var amountHighlighted = 0;
+
+    // Search for start in first next node
+    firstText = textQueue[0].textContent;
+    curLetterPos = firstText.indexOf(searchText[0]);
+    while (curLetterPos != -1) {
+        matchLength = firstText.substring(curLetterPos).length;
+        console.log("curLetterPos: " + curLetterPos);
+        console.log("first: " + firstText.substring(curLetterPos));
+        console.log(searchText.substring(0, matchLength));
+        if (matchLength <= searchText.length
+                && firstText.substring(curLetterPos) === searchText.substring(0, matchLength)) {
+            amountHighlighted += matchLength;
+            scrollHere = highlightTextNode(textQueue[0].splitText(curLetterPos));
+        } else {
+            curLetterPos = firstText.indexOf(searchText[0], curLetterPos + 1);
         }
     }
+
+    if (scrollHere == null) {
+        // TODO remove this
+        alert("We've got problems");
+    }
+
+    for (k = 1; k < textQueue.length - 1; k++) {
+        amountHighlighted += textQueue[k].textContent.length;
+        highlightTextNode(textQueue[k]);
+    }
+
+    var leftover = searchText.length - amountHighlighted;
+    if (leftover <= 0) {
+        alert("Weve got problems 2");
+    }
+    textQueue[textQueue.length - 1].splitText(leftover);
+    highlightTextNode(textQueue[textQueue.length - 1]);
+
     document.body.scrollTop = ($(scrollHere).offset().top - ($(window).height() - $(scrollHere).outerHeight(true)) / 2);
 }
 
@@ -96,7 +129,7 @@ function SearchState(pattern) {
     };
 
     var lastTable = buildLastTable();
-    console.log(pattern);
+    //console.log(pattern);
 
     this.searchCompleted = false;
 
@@ -139,15 +172,15 @@ function SearchState(pattern) {
         textQueue.push(textNode);
         bufferedLength += addToTextView(textNode.textContent).length;
 
-        console.log("Pattern len: " + pattern.length + ". Buffer len: " + bufferedLength);
-        console.log(textView);
+        //console.log("Pattern len: " + pattern.length + ". Buffer len: " + bufferedLength);
+        //console.log(textView);
         if (bufferedLength >= pattern.length) {
             while (getFromText(i) != null) {
-                console.log("TextView: " + textView);
-                console.log("Context: " + textView.substring(i - firstLetterPos, textView.length));
-                console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
+                //console.log("TextView: " + textView);
+                //console.log("Context: " + textView.substring(i - firstLetterPos, textView.length));
+                //console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
                 while (j >= 0 && pattern[j] == getFromText(i)) {
-                    console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
+                    //console.log(String(i) + " in text: " + getFromText(i) + ". " + String(j) + " in pattern: " + pattern[j]);
                     j--;
                     i--;
                 }
@@ -157,7 +190,7 @@ function SearchState(pattern) {
                         var remLen = chopAndEscape(removed.textContent).length;
                         firstLetterPos += remLen;
                         bufferedLength -= remLen;
-                        console.log("Removed: " + removed.textContent);
+                        //console.log("Removed: " + removed.textContent);
                     }
                     updateTextView();
                     this.searchResult = {
@@ -183,13 +216,14 @@ function SearchState(pattern) {
             var remLen = chopAndEscape(removed.textContent).length;
             firstLetterPos += remLen;
             bufferedLength -= remLen;
-            console.log("Removed: " + removed.textContent);
+            //console.log("Removed: " + removed.textContent);
         }
         updateTextView();
 
         return false;
     };
 }
+
 
 searchText = chopAndEscape(searchText);
 console.log(searchText);
